@@ -1,7 +1,7 @@
 {
   "name": "@umiyak/use-sequential-effect",
   "version": "1.0.0",
-  "description": "A useEffect wrapper for running effects sequentially",
+  "description": "A React hook that runs useEffect callbacks sequentially",
   "type": "module",
   "exports": {
     ".": {

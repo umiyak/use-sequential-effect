@@ -1,6 +1,6 @@
 # useSequentialEffect
 
-A useEffect wrapper for running effects sequentially, including those with asynchronous operations.
+A React hook that runs useEffect callbacks sequentially.
 
 ## Install
 
@@ -24,13 +24,14 @@ useSequentialEffect(async () => {
 
 ### Features
 
-1. Sequential Execution: Runs the effect's setup and cleanup in order.
-2. Guaranteed Cleanup: Starts the next effect only after the asynchronous cleanup is completed.
-3. Latest Effect Priority: If a new effect is registered, any pending older effects that haven't started yet are skipped.
+- Sequential Execution: Executes effect setup and cleanup in order.
+- Guaranteed Cleanup: Ensures the next effect starts only after asynchronous cleanup completes.
+- Latest Effect Priority: Skips pending older effects when a new one is registered.
 
 ### Trade-offs
 
-- Performance: Since each effect runs sequentially, performance may be lower compared to running multiple effects concurrently.
+- **Performance**: Sequential execution lowers overall throughput compared to concurrent execution.
+- **Responsiveness**: Since new effects wait for cleanup completion, UI updates may feel delayed.
 
 ## License
 
