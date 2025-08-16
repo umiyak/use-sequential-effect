@@ -5,7 +5,7 @@ A React hook that runs useEffect callbacks sequentially.
 ## Install
 
 ```bash
-npm install @umiyak/use-sequential-effect
+npm install @umiyak/use-sequential-effect@beta
 ```
 
 ## Usage
