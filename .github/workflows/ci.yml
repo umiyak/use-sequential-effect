@@ -65,8 +65,8 @@ jobs:
             const highVulns = vulnerabilities.high || 0;
             const criticalVulns = vulnerabilities.critical || 0;
             
-            if (totalVulns === 0) {
-              console.log('No vulnerabilities found - skipping comment');
+            if (highVulns === 0 && criticalVulns === 0) {
+              console.log('No high/critical vulnerabilities found - skipping comment');
               return;
             }
             
