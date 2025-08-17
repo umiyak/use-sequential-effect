@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Security audit
+        id: audit
+        run: |
+          npm audit --audit-level=high --json > audit-results.json || true
+          echo "audit_exit_code=$?" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Comment audit results on PR
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            let auditResults;
+            try {
+              const auditData = fs.readFileSync('audit-results.json', 'utf8');
+              auditResults = JSON.parse(auditData);
+            } catch (error) {
+              console.log('No audit results found or failed to parse');
+              return;
+            }
+            
+            const vulnerabilities = auditResults.metadata?.vulnerabilities;
+            
+            if (!vulnerabilities) {
+              return;
+            }
+            
+            const totalVulns = vulnerabilities.total || 0;
+            const highVulns = vulnerabilities.high || 0;
+            const criticalVulns = vulnerabilities.critical || 0;
+            
+            if (totalVulns === 0) {
+              console.log('No vulnerabilities found - skipping comment');
+              return;
+            }
+            
+            let comment = '## 🔒 Security Audit Results\n\n';
+            comment += `⚠️ Found **${totalVulns}** vulnerabilities:\n`;
+            comment += `- Critical: ${criticalVulns}\n`;
+            comment += `- High: ${highVulns}\n`;
+            comment += `- Moderate: ${vulnerabilities.moderate || 0}\n`;
+            comment += `- Low: ${vulnerabilities.low || 0}\n\n`;
+            
+            if (highVulns > 0 || criticalVulns > 0) {
+              comment += '❗ **Action required**: High or critical vulnerabilities detected.\n';
+            }
+            
+            comment += '\nRun `npm audit fix` to resolve fixable issues.';
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
