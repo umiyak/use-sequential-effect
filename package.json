@@ -37,7 +37,7 @@
     "@vitejs/plugin-react": "^4.2.1",
     "@vitest/coverage-v8": "^1.4.0",
     "jsdom": "^26.1.0",
-    "lefthook": "^1.12.3",
+    "lefthook": "^2.0.1",
     "react": "^18.2.0",
     "typescript": "^5.2.2",
     "vite": "^5.2.0",
